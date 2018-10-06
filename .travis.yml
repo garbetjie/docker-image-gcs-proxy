@@ -1,0 +1,25 @@
+---
+language: generic
+services:
+  - docker
+
+env:
+  global:
+#    - DOCKER_HUB_LOGIN
+#    - DOCKER_HUB_PASSWORD
+#    - DOCKER_HUB_REPO
+    - COMMIT="${TRAVIS_COMMIT:0:7}"
+
+
+before_script:
+  - docker pull ${DOCKER_HUB_REPO}/gcs-proxy:latest
+
+script:
+  - docker build --cache-from ${DOCKER_HUB_REPO}/gcs-proxy:latest -t ${DOCKER_HUB_REPO}/gcs-proxy:latest
+  - docker build --cache-from ${DOCKER_HUB_REPO}/gcs-proxy:latest -t ${DOCKER_HUB_REPO}/gcs-proxy:${COMMIT}
+
+deploy:
+  - provider: script
+    script: "${TRAVIS_BUILD_DIR}/deploy.sh"
+    on:
+      branch: master
